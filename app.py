@@ -228,8 +228,68 @@ def progress_module():
         st.write("Current Tracking Workflow:")
         st.info("Input (Fly/Block) ➔ Kinematic Engine ➔ Precise 100m Projection")
         
-def leaderboard_module(): st.header("🏆 Team Leaderboard")
-def relay_module(): st.header("⚡ Relay Optimizer & Go Marks")
+def leaderboard_module():
+    st.header("🏆 Team Leaderboard")
+    
+    # 1. Fly Leaderboard (Fastest Time)
+    st.subheader("Top 20: 20m Fly")
+    if not st.session_state.fly_sessions.empty:
+        fly_rank = st.session_state.fly_sessions.sort_values(by="fly_time").head(20)
+        st.table(fly_rank[["name", "fly_time"]])
+    
+    # 2. Block Leaderboard (Fastest Time)
+    st.subheader("Top 20: 30m Block Start")
+    if not st.session_state.block_sessions.empty:
+        block_rank = st.session_state.block_sessions.sort_values(by="block_time").head(20)
+        st.table(block_rank[["name", "block_time"]])
+        
+    # 3. Official Meet Leaderboards
+    for race in ["100m", "200m", "400m"]:
+        st.subheader(f"Top 20: {race}")
+        if not st.session_state.meet_results.empty:
+            race_data = st.session_state.meet_results[st.session_state.meet_results["race"] == race]
+            if not race_data.empty:
+                st.table(race_data.sort_values(by="time").head(20)[["name", "time"]])
+
+def leaderboard_module():
+    st.header("🏆 Team Leaderboard")
+    
+    # 1. 100m Projected Leaderboard (Dynamic Calculation)
+    st.subheader("Top 20: 100m Projected")
+    if not st.session_state.fly_sessions.empty and not st.session_state.block_sessions.empty:
+        projections = []
+        for a in st.session_state.roster["name"].unique():
+            f = st.session_state.fly_sessions[st.session_state.fly_sessions["name"] == a]
+            b = st.session_state.block_sessions[st.session_state.block_sessions["name"] == a]
+            if not f.empty and not b.empty:
+                # Running the engine logic
+                proj = get_unified_projection("Combined", 0, b.iloc[-1]["block_time"], f.iloc[-1]["fly_time"], "Male")
+                projections.append({"name": a, "projection": proj})
+        
+        if projections:
+            st.table(pd.DataFrame(projections).sort_values("projection").head(20))
+    else:
+        st.info("Log Fly and Block sessions to generate projections.")
+
+    # 2. Training Metric Leaderboards
+    col1, col2 = st.columns(2)
+    with col1:
+        st.subheader("Top 20: 20m Fly")
+        if not st.session_state.fly_sessions.empty:
+            st.table(st.session_state.fly_sessions.sort_values("fly_time").head(20)[["name", "fly_time"]])
+    
+    with col2:
+        st.subheader("Top 20: 30m Block")
+        if not st.session_state.block_sessions.empty:
+            st.table(st.session_state.block_sessions.sort_values("block_time").head(20)[["name", "block_time"]])
+
+    # 3. Official Race Leaderboards
+    for race in ["100m", "200m", "400m"]:
+        st.subheader(f"Top 20: {race}")
+        if not st.session_state.meet_results.empty:
+            race_data = st.session_state.meet_results[st.session_state.meet_results["race"] == race]
+            if not race_data.empty:
+                st.table(race_data.sort_values("time").head(20)[["name", "time"]])
 
 # ==========================================
 # 4. MAIN EXECUTION
