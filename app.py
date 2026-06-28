@@ -321,7 +321,7 @@ def generate_relay_pdf(order, go_marks):
 def relay_optimizer_module():
     st.header("⚡ Relay Optimizer")
     
-    # 1. Suggested Order Logic (Card UI + Unique Selection)
+    # 1. Suggested Order Logic
     st.subheader("Data-Driven Suggestions")
     
     all_metrics = []
@@ -338,7 +338,6 @@ def relay_optimizer_module():
             pool = df[df["name"] != s1["name"]].sort_values("fly")
             s2, s3, s4 = pool.iloc[0], pool.iloc[1], pool.iloc[2]
             
-            # Using the format from Screenshot_20260628-182752.Chrome.png
             legs = [("1st (Starter)", s1), ("2nd (Backstretch)", s2), ("3rd (Curve)", s3), ("4th (Anchor)", s4)]
             
             for leg_name, athlete in legs:
@@ -350,7 +349,7 @@ def relay_optimizer_module():
 
     st.markdown("---")
     
-    # 2. Manual Override (3 Exchanges + PDF)
+    # 2. Manual Override
     st.subheader("Manual Lineup Override")
     selected_runners = st.multiselect("Select 4 runners:", st.session_state.roster["name"].unique(), max_selections=4)
     
@@ -358,30 +357,37 @@ def relay_optimizer_module():
         cols = st.columns(4)
         order_list = [cols[i].selectbox(f"Leg {i+1}", selected_runners, key=f"leg_{i}") for i in range(4)]
         
-        if st.button("Calculate Exchanges & PDF"):
+        # Use session state to store exchange results so they persist
+        if "exchange_data" not in st.session_state:
+            st.session_state.exchange_data = None
+            
+        if st.button("Calculate Exchanges"):
             exchanges = []
-            for i in range(3): # Only 3 exchanges for 4x100
+            for i in range(3):
                 name_in = order_list[i]
                 name_out = order_list[i+1]
-                
                 f = st.session_state.fly_sessions[st.session_state.fly_sessions["name"]==name_in]["fly_time"].iloc[-1]
                 b = st.session_state.block_sessions[st.session_state.block_sessions["name"]==name_out]["block_time"].iloc[-1]
                 gen = st.session_state.roster[st.session_state.roster["name"]==name_out]["gender"].iloc[0]
-                
                 raw, _ = get_go_mark_logic(f, b, gen)
                 exchanges.append((name_in, name_out, raw))
-
-            # Display Exchange Cards matching 1000059054.png style
+            
+            st.session_state.exchange_data = (order_list, exchanges)
+            
+        # If calculations exist, display them and show the separate PDF button
+        if st.session_state.exchange_data:
+            order_list, exchanges = st.session_state.exchange_data
             for i, (n1, n2, mark) in enumerate(exchanges):
                 with st.container(border=True):
                     st.write(f"🔄 Exchange {i+1}: {n1} → {n2}")
                     st.metric("Recommended Mark", f"{mark} feet")
             
-            # Generate and Download
-            generate_relay_pdf(order_list, {n: m for n, _, m in exchanges})
-            with open("relay_report.pdf", "rb") as f:
-                st.download_button("Download Relay Report (PDF)", f, "relay_report.pdf")
-
+            # PDF Generation is now a separate, conditional step
+            if st.button("Generate & Download PDF"):
+                generate_relay_pdf(order_list, {n: m for n, _, m in exchanges})
+                with open("relay_report.pdf", "rb") as f:
+                    st.download_button("Download Relay Report (PDF)", f, "relay_report.pdf")
+                    
 # ==========================================
 # 4. MAIN EXECUTION
 # ==========================================
