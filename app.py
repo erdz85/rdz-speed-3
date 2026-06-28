@@ -6,21 +6,21 @@ from fpdf import FPDF
 # ==========================================
 # 1. KINEMATIC ENGINE (Revised)
 # ==========================================
-def get_unified_projection(session_type, fat_time, block_val, fly_val, gender):
+def get_unified_projection(fly_time, block_time, gender):
+    # 1. Determine if female for the constant
     is_female = 'female' in str(gender).lower()
     
-    # 1. If we have a Block AND a Fly time, use the advanced Kinematic formula
-    if block_val and block_val > 0 and fly_val and fly_val > 0:
-        base_proj = block_val + (3.5 * fly_val)
-        c = (0.15 if base_proj < 12.2 else 0.25) if is_female else (0.12 if base_proj < 11.0 else 0.18)
-        return round(base_proj + c, 2)
-    
-    # 2. If we ONLY have Fly time, use the "1000058263.png" formula exclusively
-    elif fly_val and fly_val > 0:
-        gender_const = 1.15 if is_female else 1.05 
-        return round(((fly_val / 2) * 10) + gender_const, 2)
+    # 2. If we have a block time, use the "Pro" math
+    if block_time and block_time > 0:
+        base = block_time + (3.5 * fly_time)
+        # Use a simple constant based on gender to keep it stable
+        c = 0.20 if is_female else 0.15
+        return round(base + c, 2)
         
-    return 0.0
+    # 3. If we DON'T have a block time, use your 10m split anchor
+    else:
+        const = 1.15 if is_female else 1.05
+        return round(((fly_time / 2) * 10) + const, 2)
 
 def get_go_mark_logic(f, b, gen):
     # Keeping your existing go mark logic intact as requested
