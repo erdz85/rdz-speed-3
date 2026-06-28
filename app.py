@@ -118,15 +118,6 @@ def fly_module():
             save_fly_data()
             st.rerun()
             
-    st.subheader("Recent Fly Sessions")
-    st.dataframe(st.session_state.fly_sessions)
-    if not st.session_state.fly_sessions.empty:
-        idx_to_del = st.selectbox("Select row to delete (Fly)", st.session_state.fly_sessions.index)
-        if st.button("Delete Selected Fly Session"):
-            st.session_state.fly_sessions = st.session_state.fly_sessions.drop(idx_to_del)
-            save_fly_data()
-            st.rerun()       
-            
 def block_module():
     st.header("🚀 30m Block Start Log")
     
