@@ -3,23 +3,22 @@ import pandas as pd
 import os
 from fpdf import FPDF
 
-# ==========================================
-# 1. KINEMATIC ENGINE (Fixed)
-# ==========================================
-def get_unified_projection(fly_time, block_time, gender):
+def get_unified_projection(session_type, fat_time, block_val, fly_val, gender):
     is_female = 'female' in str(gender).lower()
     
-    # If a block_time is provided, use the precision kinematic formula
-    if block_time and block_time > 0:
-        base_proj = block_time + (3.5 * fly_time)
-        c = (0.15 if base_proj < 12.2 else 0.25) if is_female else (0.12 if base_proj < 11.0 else 0.18)
-        return round(base_proj + c, 2)
-        
-    # If no block_time, use your 10m Split Equivalent anchor
-    else:
-        gender_const = 1.15 if is_female else 1.05
-        projection = ((fly_time / 2) * 10) + gender_const
-        return round(projection, 2)
+    # 1. Logic for Fly or Combined sessions
+    if session_type in ["Fly", "Combined"]:
+        # Use precision Kinematic math if a block start exists
+        if block_val and block_val > 0:
+            base_proj = block_val + (3.5 * fly_val)
+            c = (0.15 if base_proj < 12.2 else 0.25) if is_female else (0.12 if base_proj < 11.0 else 0.18)
+            return round(base_proj + c, 2)
+        # Otherwise, use your 10m Split Equivalent formula
+        else:
+            gender_const = 1.15 if is_female else 1.05
+            return round(((fly_val / 2) * 10) + gender_const, 2)
+            
+    return 0.0
 
 def get_go_mark_logic(f, b, gen):
     # Keeping your existing go mark logic intact as requested
