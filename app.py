@@ -4,23 +4,22 @@ import os
 from fpdf import FPDF
 
 # ==========================================
-# 1. KINEMATIC ENGINE (Revised)
+# 1. KINEMATIC ENGINE (Fixed)
 # ==========================================
 def get_unified_projection(fly_time, block_time, gender):
-    # 1. Determine if female for the constant
     is_female = 'female' in str(gender).lower()
     
-    # 2. If we have a block time, use the "Pro" math
+    # If a block_time is provided, use the precision kinematic formula
     if block_time and block_time > 0:
-        base = block_time + (3.5 * fly_time)
-        # Use a simple constant based on gender to keep it stable
-        c = 0.20 if is_female else 0.15
-        return round(base + c, 2)
+        base_proj = block_time + (3.5 * fly_time)
+        c = (0.15 if base_proj < 12.2 else 0.25) if is_female else (0.12 if base_proj < 11.0 else 0.18)
+        return round(base_proj + c, 2)
         
-    # 3. If we DON'T have a block time, use your 10m split anchor
+    # If no block_time, use your 10m Split Equivalent anchor
     else:
-        const = 1.15 if is_female else 1.05
-        return round(((fly_time / 2) * 10) + const, 2)
+        gender_const = 1.15 if is_female else 1.05
+        projection = ((fly_time / 2) * 10) + gender_const
+        return round(projection, 2)
 
 def get_go_mark_logic(f, b, gen):
     # Keeping your existing go mark logic intact as requested
@@ -100,9 +99,14 @@ def fly_module():
     with st.form("add_fly"):
         athlete = st.selectbox("Select Athlete", st.session_state.roster["name"].unique())
         fly_time = st.number_input("20m Fly Time (seconds)", min_value=1.0, step=0.01)
+        
         if st.form_submit_button("Log Session"):
-            # Calculate metrics using the Engine
+            # Look up gender from roster (Keeping your feature)
+            gender = st.session_state.roster.loc[st.session_state.roster['name'] == athlete, 'gender'].iloc[0]
+            
+            # Calculate metrics
             mph = round((20 / fly_time) * 2.237, 2)
+            # Pass 0 for block_time to trigger the Fly-only formula
             proj = get_unified_projection(fly_time, 0, gender) 
             
             new_entry = pd.DataFrame({
