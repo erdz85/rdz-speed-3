@@ -25,26 +25,27 @@ def get_go_mark_logic(f, b, gen):
     return raw, tier
 
 # ==========================================
-# 2. DATA PERSISTENCE
+# 2. DATA PERSISTENCE (Updated)
 # ==========================================
 def init_app():
-    # Roster
+    # 1. Roster
     if not os.path.exists("roster.csv"):
         pd.DataFrame(columns=["name", "gender", "grade"]).to_csv("roster.csv", index=False)
     if "roster" not in st.session_state:
         st.session_state.roster = pd.read_csv("roster.csv")
     
-    # Fly Sessions (NEW)
+    # 2. Fly Sessions
     if not os.path.exists("fly_sessions.csv"):
         pd.DataFrame(columns=["name", "fly_time", "mph", "projection", "date"]).to_csv("fly_sessions.csv", index=False)
     if "fly_sessions" not in st.session_state:
         st.session_state.fly_sessions = pd.read_csv("fly_sessions.csv")
-
-    # Block Sessions (NEW)
+        
+    # 3. Block Sessions
     if not os.path.exists("block_sessions.csv"):
         pd.DataFrame(columns=["name", "block_time", "date"]).to_csv("block_sessions.csv", index=False)
     if "block_sessions" not in st.session_state:
         st.session_state.block_sessions = pd.read_csv("block_sessions.csv")
+
 
 def save_block_data():
     st.session_state.block_sessions.to_csv("block_sessions.csv", index=False)
@@ -133,7 +134,33 @@ def block_module():
             save_block_data()
             st.rerun()
 
-def combined_module(): st.header("🔗 Combined 100m Projection")
+def combined_module():
+    st.header("🔗 Combined 100m Projection")
+    
+    # Check if we have data to avoid errors
+    if st.session_state.fly_sessions.empty or st.session_state.block_sessions.empty:
+        st.warning("Please log both a Fly and a Block session to see a projection.")
+        return
+
+    athlete = st.selectbox("Select Athlete for Projection", st.session_state.roster["name"].unique())
+    
+    # Filter data for this athlete
+    athlete_fly = st.session_state.fly_sessions[st.session_state.fly_sessions["name"] == athlete]
+    athlete_block = st.session_state.block_sessions[st.session_state.block_sessions["name"] == athlete]
+    
+    if not athlete_fly.empty and not athlete_block.empty:
+        # Get most recent values
+        latest_fly = athlete_fly.iloc[-1]["fly_time"]
+        latest_block = athlete_block.iloc[-1]["block_time"]
+        gender = st.session_state.roster[st.session_state.roster["name"] == athlete]["gender"].values[0]
+        
+        # Calculate
+        proj = get_unified_projection("Combined", 0, latest_block, latest_fly, gender)
+        
+        st.metric(label="Projected 100m Time", value=f"{proj} seconds")
+        st.write(f"Based on: {latest_fly}s Fly and {latest_block}s Block Start")
+    else:
+        st.warning("Selected athlete needs data in both modules.")
 def meet_module(): st.header("📅 Official Meet Results")
 def progress_module(): st.header("📈 Athlete Progress")
 def leaderboard_module(): st.header("🏆 Team Leaderboard")
