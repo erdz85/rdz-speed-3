@@ -357,34 +357,43 @@ def relay_optimizer_module():
         cols = st.columns(4)
         order_list = [cols[i].selectbox(f"Leg {i+1}", selected_runners, key=f"leg_{i}") for i in range(4)]
         
-        # Use session state to store exchange results so they persist
-        if "exchange_data" not in st.session_state:
-            st.session_state.exchange_data = None
-            
+        if "exchanges_data" not in st.session_state:
+            st.session_state.exchanges_data = None
+            st.session_state.order_list = None
+
         if st.button("Calculate Exchanges"):
             exchanges = []
             for i in range(3):
                 name_in = order_list[i]
                 name_out = order_list[i+1]
+                
                 f = st.session_state.fly_sessions[st.session_state.fly_sessions["name"]==name_in]["fly_time"].iloc[-1]
                 b = st.session_state.block_sessions[st.session_state.block_sessions["name"]==name_out]["block_time"].iloc[-1]
                 gen = st.session_state.roster[st.session_state.roster["name"]==name_out]["gender"].iloc[0]
+                
                 raw, _ = get_go_mark_logic(f, b, gen)
                 exchanges.append((name_in, name_out, raw))
             
-            st.session_state.exchange_data = (order_list, exchanges)
-            
-        # If calculations exist, display them and show the separate PDF button
-        if st.session_state.exchange_data:
-            order_list, exchanges = st.session_state.exchange_data
-            for i, (n1, n2, mark) in enumerate(exchanges):
+            st.session_state.exchanges_data = exchanges
+            st.session_state.order_list = order_list
+            st.rerun()
+
+        if st.session_state.exchanges_data:
+            for i, (n1, n2, mark) in enumerate(st.session_state.exchanges_data):
                 with st.container(border=True):
                     st.write(f"🔄 Exchange {i+1}: {n1} → {n2}")
                     st.metric("Recommended Mark", f"{mark} feet")
             
-            # PDF Generation is now a separate, conditional step
+            # PATCH: Map list to dict for PDF generator
+            order_dict = {
+                "1st": st.session_state.order_list[0],
+                "2nd": st.session_state.order_list[1],
+                "3rd": st.session_state.order_list[2],
+                "4th": st.session_state.order_list[3]
+            }
+            
             if st.button("Generate & Download PDF"):
-                generate_relay_pdf(order_list, {n: m for n, _, m in exchanges})
+                generate_relay_pdf(order_dict, {n: m for n, _, m in st.session_state.exchanges_data})
                 with open("relay_report.pdf", "rb") as f:
                     st.download_button("Download Relay Report (PDF)", f, "relay_report.pdf")
                     
