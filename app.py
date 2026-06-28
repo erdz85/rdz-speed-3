@@ -28,7 +28,8 @@ def get_go_mark_logic(f, b, gen):
     return raw, tier
 
 # ==========================================
-# 2. DATA PERSISTENCE (Updated)
+# ==========================================
+# 2. DATA PERSISTENCE (Corrected)
 # ==========================================
 def init_app():
     # 1. Roster
@@ -49,25 +50,31 @@ def init_app():
     if "block_sessions" not in st.session_state:
         st.session_state.block_sessions = pd.read_csv("block_sessions.csv")
    
-    # --- Add to init_app ---
+    # 4. Meet Results
     if not os.path.exists("meet_results.csv"):
         pd.DataFrame(columns=["name", "race", "time", "meet_name", "date"]).to_csv("meet_results.csv", index=False)
     if "meet_results" not in st.session_state:
         st.session_state.meet_results = pd.read_csv("meet_results.csv")
+        
+    # 5. Combined Sessions
+    if 'combined_sessions' not in st.session_state:
+        st.session_state.combined_sessions = pd.DataFrame(columns=["name", "fly_time", "block_time", "projection", "date"])
 
-# --- Add new save function ---
-def save_meet_data():
-    st.session_state.meet_results.to_csv("meet_results.csv", index=False)
+# --- Save Functions ---
+def save_data():
+    st.session_state.roster.to_csv("roster.csv", index=False)
+
+def save_fly_data():
+    st.session_state.fly_sessions.to_csv("fly_sessions.csv", index=False)
 
 def save_block_data():
     st.session_state.block_sessions.to_csv("block_sessions.csv", index=False)
 
-def save_data():
-    st.session_state.roster.to_csv("roster.csv", index=False)
+def save_meet_data():
+    st.session_state.meet_results.to_csv("meet_results.csv", index=False)
 
-def save_fly_data(): # Add this new save function
-    st.session_state.fly_sessions.to_csv("fly_sessions.csv", index=False)
-
+def save_combined_data():
+    st.session_state.combined_sessions.to_csv("combined_sessions.csv", index=False)
 
 # ==========================================
 # 3. MODULES
