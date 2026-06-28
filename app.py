@@ -105,8 +105,9 @@ def fly_module():
             
             # Calculate metrics
             mph = round((20 / fly_time) * 2.237, 2)
-            # Pass 0 for block_time to trigger the Fly-only formula
-            proj = get_unified_projection(fly_time, 0, gender) 
+            # Pass 5 arguments so it matches the function definition:
+            proj = get_unified_projection("Fly", None, 0, fly_time, gender)
+ 
             
             new_entry = pd.DataFrame({
                 "name": [athlete], "fly_time": [fly_time], 
