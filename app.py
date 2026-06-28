@@ -370,5 +370,4 @@ with tabs[3]: combined_module()
 with tabs[4]: meet_module()
 with tabs[5]: progress_module()
 with tabs[6]: leaderboard_module()
-with tabs[7]: relay_module()
-    
+with tabs[7]: relay_optimizer_module()
