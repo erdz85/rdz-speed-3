@@ -103,7 +103,7 @@ def fly_module():
         if st.form_submit_button("Log Session"):
             # Calculate metrics using the Engine
             mph = round((20 / fly_time) * 2.237, 2)
-            proj = get_unified_projection("Fly", fly_time, None, fly_time, "Male") 
+            proj = get_unified_projection(fly_time, 0, gender) 
             
             new_entry = pd.DataFrame({
                 "name": [athlete], "fly_time": [fly_time], 
