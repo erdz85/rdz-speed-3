@@ -401,7 +401,7 @@ def relay_optimizer_module():
 # 4. MAIN EXECUTION
 # ==========================================
 init_app()
-st.title("I Love Yesenia - RDZ Speed Development")
+st.title("RDZ Speed Lab ⚡ 🧪")
 
 tabs = st.tabs(["👤 Roster", "🪰 Fly", "🚀 Block", "🔗 Combined", "📅 Meets", "📈 Progress", "🏆 Leaderboard", "⚡ Relay"])
 
