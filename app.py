@@ -333,17 +333,22 @@ def relay_optimizer_module():
             
     if all_metrics:
         df_metrics = pd.DataFrame(all_metrics)
-        suggested = pd.DataFrame({
-            "Leg": ["1st (Starter)", "2nd (Flyer)", "3rd", "4th (Anchor)"],
-            "Suggested Athlete": [
-                df_metrics.sort_values("block").iloc[0]["name"],
-                df_metrics.sort_values("fly").iloc[0]["name"],
-                df_metrics.sort_values("fly").iloc[1]["name"],
-                df_metrics.sort_values("fly").iloc[2]["name"]
-            ]
-        })
-        st.write("Suggested Order (Prioritizing Best Fly for 2nd Leg):")
-        st.table(suggested)
+        
+        # PATCHED: Added safety check for the sorting logic
+        if len(df_metrics) >= 3:
+            suggested = pd.DataFrame({
+                "Leg": ["1st (Starter)", "2nd (Flyer)", "3rd", "4th (Anchor)"],
+                "Suggested Athlete": [
+                    df_metrics.sort_values("block").iloc[0]["name"],
+                    df_metrics.sort_values("fly").iloc[0]["name"],
+                    df_metrics.sort_values("fly").iloc[1]["name"],
+                    df_metrics.sort_values("fly").iloc[2]["name"]
+                ]
+            })
+            st.write("Suggested Order (Prioritizing Best Fly for 2nd Leg):")
+            st.table(suggested)
+        else:
+            st.info("Log at least 3 athletes with both Fly and Block times to see the automated relay suggestion.")
         
     st.markdown("---")
     
