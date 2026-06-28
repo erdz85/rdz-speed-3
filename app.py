@@ -321,7 +321,7 @@ def generate_relay_pdf(order, go_marks):
 def relay_optimizer_module():
     st.header("⚡ Relay Optimizer")
     
-    # 1. Suggested Order Logic
+    # 1. Suggested Order Logic (Card UI + Unique Selection)
     st.subheader("Data-Driven Suggestions")
     
     all_metrics = []
@@ -332,50 +332,55 @@ def relay_optimizer_module():
             all_metrics.append({"name": a, "fly": f, "block": b})
             
     if all_metrics:
-        df_metrics = pd.DataFrame(all_metrics)
-        
-        # PATCHED: Added safety check for the sorting logic
-        if len(df_metrics) >= 3:
-            suggested = pd.DataFrame({
-                "Leg": ["1st (Starter)", "2nd (Flyer)", "3rd", "4th (Anchor)"],
-                "Suggested Athlete": [
-                    df_metrics.sort_values("block").iloc[0]["name"],
-                    df_metrics.sort_values("fly").iloc[0]["name"],
-                    df_metrics.sort_values("fly").iloc[1]["name"],
-                    df_metrics.sort_values("fly").iloc[2]["name"]
-                ]
-            })
-            st.write("Suggested Order (Prioritizing Best Fly for 2nd Leg):")
-            st.table(suggested)
+        df = pd.DataFrame(all_metrics)
+        if len(df) >= 4:
+            # Logic: Unique assignments (1st: best block, others: best fly)
+            s1 = df.sort_values("block").iloc[0]
+            pool = df[df["name"] != s1["name"]].sort_values("fly")
+            s2, s3, s4 = pool.iloc[0], pool.iloc[1], pool.iloc[2]
+            
+            legs = [("1st (Starter)", s1), ("2nd (Recta)", s2), ("3rd (Curva)", s3), ("4th (Ancla)", s4)]
+            
+            for leg_name, athlete in legs:
+                with st.container(border=True):
+                    col_a, col_b = st.columns([3, 1])
+                    col_a.markdown(f"**{leg_name}**: {athlete['name']}")
+                    col_b.write(f"{athlete['fly']:.2f}s")
         else:
-            st.info("Log at least 3 athletes with both Fly and Block times to see the automated relay suggestion.")
-        
+            st.info("Log at least 4 athletes to see the suggested relay order.")
+
     st.markdown("---")
     
-    # 2. Manual Override
+    # 2. Manual Override (For PDF/Exchange Report)
     st.subheader("Manual Lineup Override")
     selected_runners = st.multiselect("Select 4 runners:", st.session_state.roster["name"].unique(), max_selections=4)
     
     if len(selected_runners) == 4:
-        col1, col2, col3, col4 = st.columns(4)
-        order = {
-            "1st": col1.selectbox("1st Leg", selected_runners),
-            "2nd": col2.selectbox("2nd Leg", selected_runners),
-            "3rd": col3.selectbox("3rd Leg", selected_runners),
-            "4th": col4.selectbox("4th Leg", selected_runners)
-        }
-        if st.button("Confirm Manual Order"):
-            # Calculate go marks for the report
-            go_marks_report = {}
-            for leg, name in order.items():
-                f = st.session_state.fly_sessions[st.session_state.fly_sessions["name"]==name]["fly_time"].iloc[-1]
-                b = st.session_state.block_sessions[st.session_state.block_sessions["name"]==name]["block_time"].iloc[-1]
-                gen = st.session_state.roster[st.session_state.roster["name"]==name]["gender"].iloc[0]
+        # User sets order
+        order_list = [st.selectbox(f"Leg {i+1}", selected_runners, key=f"leg_{i}") for i in range(4)]
+        
+        if st.button("Calculate Exchanges & PDF"):
+            # Prepare Go Mark data for 3 exchanges
+            exchanges = []
+            for i in range(3):
+                name_in = order_list[i]
+                name_out = order_list[i+1]
+                
+                f = st.session_state.fly_sessions[st.session_state.fly_sessions["name"]==name_in]["fly_time"].iloc[-1]
+                b = st.session_state.block_sessions[st.session_state.fly_sessions["name"]==name_out]["block_time"].iloc[-1]
+                gen = st.session_state.roster[st.session_state.roster["name"]==name_out]["gender"].iloc[0]
+                
                 raw, _ = get_go_mark_logic(f, b, gen)
-                go_marks_report[name] = raw
+                exchanges.append((name_in, name_out, raw))
+
+            # Display Exchange Cards
+            for i, (n1, n2, mark) in enumerate(exchanges):
+                with st.container(border=True):
+                    st.write(f"🔄 Intercambio {i+1}: {n1} → {n2}")
+                    st.metric("Marca Recomendada", f"{mark} pies")
             
-            generate_relay_pdf(order, go_marks_report)
-            st.success(f"Final Order: {order}")
+            # Export Logic
+            generate_relay_pdf(order_list, {n: m for n, _, m in exchanges})
             with open("relay_report.pdf", "rb") as f:
                 st.download_button("Download Relay Report (PDF)", f, "relay_report.pdf")
 
@@ -384,12 +389,12 @@ def relay_optimizer_module():
     st.subheader("Go Mark Calculator")
     selected_name = st.selectbox("Select Outgoing Runner", selected_runners if selected_runners else st.session_state.roster["name"].unique())
     
-    f_time = st.session_state.fly_sessions[st.session_state.fly_sessions["name"] == selected_name]["fly_time"].tail(1).values
-    b_time = st.session_state.block_sessions[st.session_state.block_sessions["name"] == selected_name]["block_time"].tail(1).values
-    gen = st.session_state.roster[st.session_state.roster["name"] == selected_name]["gender"].values
+    f_val = st.session_state.fly_sessions[st.session_state.fly_sessions["name"] == selected_name]["fly_time"].tail(1).values
+    b_val = st.session_state.block_sessions[st.session_state.fly_sessions["name"] == selected_name]["block_time"].tail(1).values
+    gen_val = st.session_state.roster[st.session_state.roster["name"] == selected_name]["gender"].values
     
-    if f_time.size > 0 and b_time.size > 0:
-        raw, tier = get_go_mark_logic(f_time[0], b_time[0], gen[0])
+    if f_val.size > 0 and b_val.size > 0:
+        raw, tier = get_go_mark_logic(f_val[0], b_val[0], gen_val[0])
         st.metric("Calculated Go Mark", f"{raw} feet")
         st.write(f"Category: **{tier}**")
 
