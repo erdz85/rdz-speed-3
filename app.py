@@ -192,7 +192,42 @@ def meet_module():
 
     st.subheader("Results Database")
     st.dataframe(st.session_state.meet_results)
-def progress_module(): st.header("📈 Athlete Progress")
+    
+def progress_module():
+    st.header("📈 Athlete Progress & PRs")
+    
+    if st.session_state.roster.empty:
+        st.warning("No athletes in roster.")
+        return
+
+    athlete = st.selectbox("Select Athlete", st.session_state.roster["name"].unique())
+    
+    # --- PR CALCULATION ---
+    # We find the min time for each metric
+    fly_pr = st.session_state.fly_sessions[st.session_state.fly_sessions["name"] == athlete]["fly_time"].min()
+    block_pr = st.session_state.block_sessions[st.session_state.block_sessions["name"] == athlete]["block_time"].min()
+    
+    # Meet PRs
+    meet_data = st.session_state.meet_results[st.session_state.meet_results["name"] == athlete]
+    pr_100 = meet_data[meet_data["race"] == "100m"]["time"].min()
+    pr_200 = meet_data[meet_data["race"] == "200m"]["time"].min()
+    pr_400 = meet_data[meet_data["race"] == "400m"]["time"].min()
+
+    # --- DISPLAY PRs ---
+    st.subheader(f"🏆 {athlete}'s Personal Records")
+    col1, col2, col3, col4, col5 = st.columns(5)
+    col1.metric("20m Fly", f"{fly_pr}s" if pd.notnull(fly_pr) else "N/A")
+    col2.metric("30m Block", f"{block_pr}s" if pd.notnull(block_pr) else "N/A")
+    col3.metric("100m", f"{pr_100}s" if pd.notnull(pr_100) else "N/A")
+    col4.metric("200m", f"{pr_200}s" if pd.notnull(pr_200) else "N/A")
+    col5.metric("400m", f"{pr_400}s" if pd.notnull(pr_400) else "N/A")
+
+    # --- LOGIC FLOW VISUALIZATION ---
+    st.markdown("---")
+    with st.expander("View Metric Logic Flow"):
+        st.write("Current Tracking Workflow:")
+        st.info("Input (Fly/Block) ➔ Kinematic Engine ➔ Precise 100m Projection")
+        
 def leaderboard_module(): st.header("🏆 Team Leaderboard")
 def relay_module(): st.header("⚡ Relay Optimizer & Go Marks")
 
