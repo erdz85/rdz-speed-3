@@ -4,22 +4,26 @@ import os
 from fpdf import FPDF
 
 # ==========================================
-# 1. KINEMATIC ENGINE
+# 1. KINEMATIC ENGINE (Revised)
 # ==========================================
 def get_unified_projection(session_type, fat_time, block_val, fly_val, gender):
     is_female = 'female' in str(gender).lower()
-    f_val = fly_val if (fly_val and fly_val > 0) else fat_time
-    b_val = block_val if (block_val and block_val > 0) else None
-    if b_val is not None:
-        base_proj = b_val + (3.5 * f_val)
+    
+    # 1. If we have a Block AND a Fly time, use the advanced Kinematic formula
+    if block_val and block_val > 0 and fly_val and fly_val > 0:
+        base_proj = block_val + (3.5 * fly_val)
         c = (0.15 if base_proj < 12.2 else 0.25) if is_female else (0.12 if base_proj < 11.0 else 0.18)
-        return round(b_val + (3.5 * f_val) + c, 2)
-    else:
+        return round(base_proj + c, 2)
+    
+    # 2. If we ONLY have Fly time, use the "1000058263.png" formula exclusively
+    elif fly_val and fly_val > 0:
         gender_const = 1.15 if is_female else 1.05 
-        projection = (f_val / 2 * 10) + gender_const
-        return round(projection, 2)
+        return round(((fly_val / 2) * 10) + gender_const, 2)
+        
+    return 0.0
 
 def get_go_mark_logic(f, b, gen):
+    # Keeping your existing go mark logic intact as requested
     steps = (((20 / (f if f != 99.0 else 2.20)) * ((b if b != 99.0 else 4.20) * 0.71)) - 20 - 0.70) * 3.28
     raw = int(round(steps))
     tier = "Varsity" if (15 <= raw <= 22 if 'female' in str(gen).lower() else 19 <= raw <= 26) else "Developing"
