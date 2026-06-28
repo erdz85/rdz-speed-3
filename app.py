@@ -45,7 +45,16 @@ def init_app():
         pd.DataFrame(columns=["name", "block_time", "date"]).to_csv("block_sessions.csv", index=False)
     if "block_sessions" not in st.session_state:
         st.session_state.block_sessions = pd.read_csv("block_sessions.csv")
+   
+    # --- Add to init_app ---
+    if not os.path.exists("meet_results.csv"):
+        pd.DataFrame(columns=["name", "race", "time", "meet_name", "date"]).to_csv("meet_results.csv", index=False)
+    if "meet_results" not in st.session_state:
+        st.session_state.meet_results = pd.read_csv("meet_results.csv")
 
+# --- Add new save function ---
+def save_meet_data():
+    st.session_state.meet_results.to_csv("meet_results.csv", index=False)
 
 def save_block_data():
     st.session_state.block_sessions.to_csv("block_sessions.csv", index=False)
@@ -161,7 +170,28 @@ def combined_module():
         st.write(f"Based on: {latest_fly}s Fly and {latest_block}s Block Start")
     else:
         st.warning("Selected athlete needs data in both modules.")
-def meet_module(): st.header("📅 Official Meet Results")
+        
+def meet_module():
+    st.header("📅 Official Meet Results")
+    
+    with st.form("add_meet_result"):
+        athlete = st.selectbox("Select Athlete", st.session_state.roster["name"].unique())
+        race = st.selectbox("Race", ["100m", "200m", "400m"])
+        time = st.number_input("Time (seconds)", min_value=5.0, step=0.01)
+        meet_name = st.text_input("Meet Name")
+        date = st.date_input("Date")
+        
+        if st.form_submit_button("Log Result"):
+            new_entry = pd.DataFrame({
+                "name": [athlete], "race": [race], "time": [time], 
+                "meet_name": [meet_name], "date": [date]
+            })
+            st.session_state.meet_results = pd.concat([st.session_state.meet_results, new_entry], ignore_index=True)
+            save_meet_data()
+            st.success("Result logged!")
+
+    st.subheader("Results Database")
+    st.dataframe(st.session_state.meet_results)
 def progress_module(): st.header("📈 Athlete Progress")
 def leaderboard_module(): st.header("🏆 Team Leaderboard")
 def relay_module(): st.header("⚡ Relay Optimizer & Go Marks")
