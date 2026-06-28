@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
+from fpdf import FPDF
 
 # ==========================================
 # 1. KINEMATIC ENGINE
@@ -231,29 +232,6 @@ def progress_module():
 def leaderboard_module():
     st.header("🏆 Team Leaderboard")
     
-    # 1. Fly Leaderboard (Fastest Time)
-    st.subheader("Top 20: 20m Fly")
-    if not st.session_state.fly_sessions.empty:
-        fly_rank = st.session_state.fly_sessions.sort_values(by="fly_time").head(20)
-        st.table(fly_rank[["name", "fly_time"]])
-    
-    # 2. Block Leaderboard (Fastest Time)
-    st.subheader("Top 20: 30m Block Start")
-    if not st.session_state.block_sessions.empty:
-        block_rank = st.session_state.block_sessions.sort_values(by="block_time").head(20)
-        st.table(block_rank[["name", "block_time"]])
-        
-    # 3. Official Meet Leaderboards
-    for race in ["100m", "200m", "400m"]:
-        st.subheader(f"Top 20: {race}")
-        if not st.session_state.meet_results.empty:
-            race_data = st.session_state.meet_results[st.session_state.meet_results["race"] == race]
-            if not race_data.empty:
-                st.table(race_data.sort_values(by="time").head(20)[["name", "time"]])
-
-def leaderboard_module():
-    st.header("🏆 Team Leaderboard")
-    
     # 1. 100m Projected Leaderboard (Dynamic Calculation)
     st.subheader("Top 20: 100m Projected")
     if not st.session_state.fly_sessions.empty and not st.session_state.block_sessions.empty:
@@ -290,6 +268,92 @@ def leaderboard_module():
             race_data = st.session_state.meet_results[st.session_state.meet_results["race"] == race]
             if not race_data.empty:
                 st.table(race_data.sort_values("time").head(20)[["name", "time"]])
+
+def generate_relay_pdf(order, go_marks):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", 'B', 16)
+    pdf.cell(200, 10, txt="Weekly Relay Report", ln=True, align='C')
+    pdf.set_font("Arial", size=12)
+    pdf.ln(10)
+    pdf.cell(200, 10, txt="Proposed Relay Order:", ln=True)
+    for leg, name in order.items():
+        pdf.cell(200, 10, txt=f"{leg}: {name}", ln=True)
+    pdf.ln(5)
+    pdf.cell(200, 10, txt="Calculated Go Marks:", ln=True)
+    for name, mark in go_marks.items():
+        pdf.cell(200, 10, txt=f"{name}: {mark} feet", ln=True)
+    pdf.output("relay_report.pdf")
+
+def relay_optimizer_module():
+    st.header("⚡ Relay Optimizer")
+    
+    # 1. Suggested Order Logic
+    st.subheader("Data-Driven Suggestions")
+    
+    all_metrics = []
+    for a in st.session_state.roster["name"].unique():
+        f = st.session_state.fly_sessions[st.session_state.fly_sessions["name"]==a]["fly_time"].min()
+        b = st.session_state.block_sessions[st.session_state.block_sessions["name"]==a]["block_time"].min()
+        if pd.notnull(f) and pd.notnull(b):
+            all_metrics.append({"name": a, "fly": f, "block": b})
+            
+    if all_metrics:
+        df_metrics = pd.DataFrame(all_metrics)
+        suggested = pd.DataFrame({
+            "Leg": ["1st (Starter)", "2nd (Flyer)", "3rd", "4th (Anchor)"],
+            "Suggested Athlete": [
+                df_metrics.sort_values("block").iloc[0]["name"],
+                df_metrics.sort_values("fly").iloc[0]["name"],
+                df_metrics.sort_values("fly").iloc[1]["name"],
+                df_metrics.sort_values("fly").iloc[2]["name"]
+            ]
+        })
+        st.write("Suggested Order (Prioritizing Best Fly for 2nd Leg):")
+        st.table(suggested)
+        
+    st.markdown("---")
+    
+    # 2. Manual Override
+    st.subheader("Manual Lineup Override")
+    selected_runners = st.multiselect("Select 4 runners:", st.session_state.roster["name"].unique(), max_selections=4)
+    
+    if len(selected_runners) == 4:
+        col1, col2, col3, col4 = st.columns(4)
+        order = {
+            "1st": col1.selectbox("1st Leg", selected_runners),
+            "2nd": col2.selectbox("2nd Leg", selected_runners),
+            "3rd": col3.selectbox("3rd Leg", selected_runners),
+            "4th": col4.selectbox("4th Leg", selected_runners)
+        }
+        if st.button("Confirm Manual Order"):
+            # Calculate go marks for the report
+            go_marks_report = {}
+            for leg, name in order.items():
+                f = st.session_state.fly_sessions[st.session_state.fly_sessions["name"]==name]["fly_time"].iloc[-1]
+                b = st.session_state.block_sessions[st.session_state.block_sessions["name"]==name]["block_time"].iloc[-1]
+                gen = st.session_state.roster[st.session_state.roster["name"]==name]["gender"].iloc[0]
+                raw, _ = get_go_mark_logic(f, b, gen)
+                go_marks_report[name] = raw
+            
+            generate_relay_pdf(order, go_marks_report)
+            st.success(f"Final Order: {order}")
+            with open("relay_report.pdf", "rb") as f:
+                st.download_button("Download Relay Report (PDF)", f, "relay_report.pdf")
+
+    # 3. Go Mark Calculator
+    st.markdown("---")
+    st.subheader("Go Mark Calculator")
+    selected_name = st.selectbox("Select Outgoing Runner", selected_runners if selected_runners else st.session_state.roster["name"].unique())
+    
+    f_time = st.session_state.fly_sessions[st.session_state.fly_sessions["name"] == selected_name]["fly_time"].tail(1).values
+    b_time = st.session_state.block_sessions[st.session_state.block_sessions["name"] == selected_name]["block_time"].tail(1).values
+    gen = st.session_state.roster[st.session_state.roster["name"] == selected_name]["gender"].values
+    
+    if f_time.size > 0 and b_time.size > 0:
+        raw, tier = get_go_mark_logic(f_time[0], b_time[0], gen[0])
+        st.metric("Calculated Go Mark", f"{raw} feet")
+        st.write(f"Category: **{tier}**")
 
 # ==========================================
 # 4. MAIN EXECUTION
