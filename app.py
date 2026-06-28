@@ -120,7 +120,7 @@ def fly_module():
     st.dataframe(st.session_state.fly_sessions)
     
     if not st.session_state.fly_sessions.empty:
-        idx_to_del = st.selectbox("Select row to delete", st.session_state.fly_sessions.index)
+        idx_to_del = st.selectbox("Select row to delete", st.session_state.fly_sessions.index, key="del_fly")
         if st.button("Delete Selected Session"):
             st.session_state.fly_sessions = st.session_state.fly_sessions.drop(idx_to_del)
             save_fly_data()
@@ -145,7 +145,7 @@ def block_module():
     st.dataframe(st.session_state.block_sessions)
     
     if not st.session_state.block_sessions.empty:
-        idx_to_del = st.selectbox("Select row to delete", st.session_state.block_sessions.index)
+        idx_to_del = st.selectbox("Select row to delete", st.session_state.block_sessions.index, key="del_block")
         if st.button("Delete Selected Block Session"):
             st.session_state.block_sessions = st.session_state.block_sessions.drop(idx_to_del)
             save_block_data()
@@ -178,7 +178,16 @@ def combined_module():
         st.write(f"Based on: {latest_fly}s Fly and {latest_block}s Block Start")
     else:
         st.warning("Selected athlete needs data in both modules.")
-        
+        # Add this section at the bottom of your combined_module function
+    st.subheader("Delete Combined Session")
+    if not st.session_state.combined_sessions.empty:
+        idx_to_del = st.selectbox("Select row to delete", st.session_state.combined_sessions.index, key="del_combined")
+        if st.button("Delete Selected Combined Session"):
+            st.session_state.combined_sessions = st.session_state.combined_sessions.drop(idx_to_del)
+            # Make sure your save function is called here
+            save_combined_data() 
+            st.rerun()
+            
 def meet_module():
     st.header("📅 Official Meet Results")
     
@@ -200,7 +209,16 @@ def meet_module():
 
     st.subheader("Results Database")
     st.dataframe(st.session_state.meet_results)
-    
+        # Add this section at the bottom of your meet_module function
+    st.subheader("Delete Meet Result")
+    if not st.session_state.meet_results.empty:
+        idx_to_del = st.selectbox("Select row to delete", st.session_state.meet_results.index, key="del_meets")
+        if st.button("Delete Selected Meet Result"):
+            st.session_state.meet_results = st.session_state.meet_results.drop(idx_to_del)
+            # Make sure your save function is called here
+            save_meet_data() 
+            st.rerun()
+            
 def progress_module():
     st.header("📈 Athlete Progress & PRs")
     
