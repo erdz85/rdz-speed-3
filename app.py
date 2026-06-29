@@ -228,7 +228,7 @@ def meet_module():
             st.rerun()
             
 def progress_module():
-    st.header("📈 Athlete Progress & PRs")
+    st.header("📈 Athlete PRs")
     
     if st.session_state.roster.empty:
         st.warning("No athletes in roster.")
@@ -247,54 +247,22 @@ def progress_module():
     pr_400 = meet_data[meet_data["race"] == "400m"]["time"].min()
 
     # --- DISPLAY PRs ---
-    st.subheader(f"🏆 {athlete}'s Personal Records")
-    col1, col2, col3, col4, col5 = st.columns(5)
-    col1.metric("20m Fly", f"{fly_pr}s" if pd.notnull(fly_pr) else "N/A")
-    col2.metric("30m Block", f"{block_pr}s" if pd.notnull(block_pr) else "N/A")
-    col3.metric("100m", f"{pr_100}s" if pd.notnull(pr_100) else "N/A")
-    col4.metric("200m", f"{pr_200}s" if pd.notnull(pr_200) else "N/A")
-    col5.metric("400m", f"{pr_400}s" if pd.notnull(pr_400) else "N/A")
-
-    # --- HISTORICAL TRENDS ---
+    col1, col2 = st.columns(2)
+    col1.metric("20m Fly PR", f"{fly_pr}s" if pd.notnull(fly_pr) else "N/A")
+    col2.metric("30m Block PR", f"{block_pr}s" if pd.notnull(block_pr) else "N/A")
+    
     st.markdown("---")
-    st.subheader("📊 Performance Trends")
     
-    # 1. Training Metrics Trends
-    col_a, col_b = st.columns(2)
-    with col_a:
-        st.write("**20m Fly History**")
-        fly_hist = st.session_state.fly_sessions[st.session_state.fly_sessions["name"] == athlete].set_index("date")["fly_time"]
-        if not fly_hist.empty: st.line_chart(fly_hist)
-    with col_b:
-        st.write("**30m Block History**")
-        block_hist = st.session_state.block_sessions[st.session_state.block_sessions["name"] == athlete].set_index("date")["block_time"]
-        if not block_hist.empty: st.line_chart(block_hist)
-
-    # 2. Race Results Trends
-    col_c, col_d = st.columns(2)
-    with col_c:
-        st.write("**100m / 200m Race History**")
-        race_hist = meet_data[meet_data["race"].isin(["100m", "200m"])].pivot(index="date", columns="race", values="time")
-        if not race_hist.empty: st.line_chart(race_hist)
-    with col_d:
-        st.write("**400m Race History**")
-        four_hist = meet_data[meet_data["race"] == "400m"].set_index("date")["time"]
-        if not four_hist.empty: st.line_chart(four_hist)
-
-    # 3. Projected 100m Trend
-    st.write("**Projected 100m Trend**")
-    proj_data = []
-    # Re-calculate projection per session for the trend
-    athlete_fly = st.session_state.fly_sessions[st.session_state.fly_sessions["name"] == athlete]
-    for _, row in athlete_fly.iterrows():
-        b_val = st.session_state.block_sessions[(st.session_state.block_sessions["name"] == athlete) & (st.session_state.block_sessions["date"] == row["date"])]["block_time"]
-        b_val = b_val.iloc[0] if not b_val.empty else 0
-        p = get_unified_projection("Combined", None, b_val, row["fly_time"], gender)
-        proj_data.append({"date": row["date"], "Projected 100m": p})
+    col3, col4, col5 = st.columns(3)
+    col3.metric("100m PR", f"{pr_100}s" if pd.notnull(pr_100) else "N/A")
+    col4.metric("200m PR", f"{pr_200}s" if pd.notnull(pr_200) else "N/A")
+    col5.metric("400m PR", f"{pr_400}s" if pd.notnull(pr_400) else "N/A")
     
-    if proj_data:
-        st.line_chart(pd.DataFrame(proj_data).set_index("date"))   
-        
+    # --- CURRENT PROJECTION ---
+    st.markdown("---")
+    proj_100 = get_unified_projection("Combined", None, block_pr if pd.notnull(block_pr) else 0, fly_pr if pd.notnull(fly_pr) else 0, gender)
+    st.metric("Precise 100m Projection", f"{proj_100}s")
+      
 def leaderboard_module():
     st.header("🏆 Team Leaderboard")
     
