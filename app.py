@@ -185,16 +185,7 @@ def combined_module():
         st.metric(label="Projected 100m Time", value=f"{proj} seconds")
         st.write(f"Based on: {latest_fly}s Fly and {latest_block}s Block Start")
     else:
-        st.warning("Selected athlete needs data in both modules.")
-        # Add this section at the bottom of your combined_module function
-    st.subheader("Delete Combined Session")
-    if not st.session_state.combined_sessions.empty:
-        idx_to_del = st.selectbox("Select row to delete", st.session_state.combined_sessions.index, key="del_combined")
-        if st.button("Delete Selected Combined Session"):
-            st.session_state.combined_sessions = st.session_state.combined_sessions.drop(idx_to_del)
-            # Make sure your save function is called here
-            save_combined_data() 
-            st.rerun()
+        st.warning("Selected athlete needs data in both modules.")      
             
 def meet_module():
     st.header("📅 Official Meet Results")
