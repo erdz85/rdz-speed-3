@@ -276,7 +276,7 @@ def leaderboard_module():
             b = st.session_state.block_sessions[st.session_state.block_sessions["name"] == a]
             if not f.empty and not b.empty:
                 # Running the engine logic
-                proj = get_unified_projection("Combined", 0, b.iloc[-1]["block_time"], f.iloc[-1]["fly_time"], "Male")
+                proj = get_unified_projection("Combined", 0, b.iloc[-1]["block_time"], f.iloc[-1]["fly_time"], "gender")
                 projections.append({"name": a, "projection": proj})
         
         if projections:
