@@ -3,6 +3,16 @@ import pandas as pd
 import os
 from fpdf import FPDF
 
+# 2. LOGIN LOGIC (The Foyer)
+if "logged_in" not in st.session_state:
+    st.title("Welcome to RDZ Speed Lab")
+    coach_name = st.selectbox("Select Coach", ["YourName", "YeseniaRubyRodriguez"])
+    if st.button("Login"):
+        st.session_state.coach_id = coach_name
+        st.session_state.logged_in = True
+        st.rerun()
+    st.stop() # This forces the app to wait here until login
+
 def get_unified_projection(session_type, fat_time, block_val, fly_val, gender):
     is_female = 'female' in str(gender).lower()
     
