@@ -498,7 +498,7 @@ def workout_module():
 init_app()
 st.title("RDZ Speed Lab ⚡ 🧪")
 
-tabs = st.tabs(["👤 Roster", "🪰 Fly", "🚀 Block", "🔗 Combined", "📅 Meets", "📈 Progress", "🏆 Leaderboard", "⚡ Relay", "🏋️ Workout")
+tabs = st.tabs(["👤 Roster", "🪰 Fly", "🚀 Block", "🔗 Combined", "📅 Meets", "📈 Progress", "🏆 Leaderboard", "⚡ Relay", "🏋️ Workout"])
 
 with tabs[0]: roster_module()
 with tabs[1]: fly_module()
