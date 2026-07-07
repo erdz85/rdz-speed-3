@@ -92,14 +92,102 @@ def generate_training_pdf():
     [span_21](start_span)pdf.text(16, y_pos + 6, "VIERNES: SPEED ENDURANCE & RELAXATION") #[span_21](end_span)
     pdf.set_font("Helvetica", "I", 9)
     pdf.set_text_color(*TEXT_MUTED)
-    [span_22](start_span)pdf.text(16, y_pos + 11, "Focus: Maintaining high top-end velocities without tightening up late in the race.") #[span_22](end_span)
+def generate_training_pdf():
+    pdf = FPDF()
+    pdf.add_page()
+    
+    # --- BRAND COLOR PALETTE ---
+    PRIMARY_DARK = (20, 24, 33)    # Athletic charcoal
+    ACCENT_YELLOW = (255, 204, 0)  # Speed lab lightning yellow
+    TEXT_DARK = (30, 30, 30)       # Main body text
+    TEXT_MUTED = (100, 105, 115)   # Subtitles
+    BG_LIGHT = (245, 247, 250)     # Clean card backgrounds
+
+    # --- TOP BRANDING HEADER ---
+    pdf.set_fill_color(*PRIMARY_DARK)
+    pdf.rect(0, 0, 210, 42, 'F')
+    
+    # Yellow Accent Bar
+    pdf.set_fill_color(*ACCENT_YELLOW)
+    pdf.rect(0, 42, 210, 2, 'F')
+    
+    # Main Header Text
+    pdf.set_font("Helvetica", "B", 16)
+    pdf.set_text_color(255, 255, 255)
+    pdf.text(15, 16, "RDZ SPEED DEVELOPMENT FLYS DATA V0.13.5")
+    
+    pdf.set_font("Helvetica", "", 10)
+    pdf.set_text_color(200, 205, 215)
+    pdf.text(15, 24, "Summer Training Plan Block")
+    pdf.text(15, 30, "Microcycle: Week 1 Consolidation")
+    
+    # Athlete & Phase Info (Right Aligned layout positions)
+    pdf.set_font("Helvetica", "B", 10)
+    pdf.set_text_color(*ACCENT_YELLOW)
+    pdf.text(130, 16, "ATLETA: Aisa Rodriguez (10th)")
+    pdf.set_font("Helvetica", "", 10)
+    pdf.set_text_color(255, 255, 255)
+    pdf.text(130, 24, "Fase: Phase 1 (Force & Coordination)")
+    pdf.text(130, 30, "Objetivo: Sub-14 Transition (Target: 13s Hunt)")
+
+    # --- WORKOUT BLOCKS ---
+    y_pos = 52
+
+    # 1. MIÉRCOLES BLOCK
+    pdf.set_fill_color(*BG_LIGHT)
+    pdf.rect(12, y_pos, 186, 44, 'F')
+    pdf.set_text_color(*PRIMARY_DARK)
+    pdf.set_font("Helvetica", "B", 11)
+    pdf.text(16, y_pos + 6, "MIERCOLES: MAX VELOCITY & POSTURE")
+    pdf.set_font("Helvetica", "I", 9)
+    pdf.set_text_color(*TEXT_MUTED)
+    pdf.text(16, y_pos + 11, "Focus: Vertical mechanics and transitioning raw 18.4 mph power into an efficient upright stride.")
     
     pdf.set_font("Helvetica", "", 9.5)
     pdf.set_text_color(*TEXT_DARK)
-    [span_23](start_span)pdf.text(16, y_pos + 18, "• Warm-Up: Standard full dynamic track protocol.") #[span_23](end_span)
-    [span_24](start_span)pdf.text(16, y_pos + 23, "• The Workout: Ins & Outs (Float Sprints) - 60 meters total distance.") #[span_24](end_span)
-    [span_25](start_span)pdf.text(16, y_pos + 28, "• Execution: 20m acceleration zone -> 20m 'Float' phase (relax jaw/face/shoulders) -> 20m re-acceleration.") #[span_25](end_span)
-    [span_26](start_span)pdf.text(16, y_pos + 33, "• Volume & Rest: 3 high-quality reps. 5 full minutes rest between reps.") #[span_26](end_span)
+    pdf.text(16, y_pos + 18, "• Pre-Session Prep: 3 Dynamic Mobility Movements + Fence Drills / Wall Knee Drives (3x10 single exchanges).")
+    pdf.text(16, y_pos + 23, "  Lock in 'Toes to the Nose'.")
+    pdf.set_font("Helvetica", "B", 9.5)
+    pdf.text(16, y_pos + 29, "The Technical Tool: Wicket Runs (5-6 high-quality runs).")
+    pdf.set_font("Helvetica", "", 9.5)
+    pdf.text(16, y_pos + 34, "• Setup & Spacing: Set up at a 5.0 ft base. First marker 11-12m from start line, followed by 6 to 8 wickets.")
+    pdf.text(16, y_pos + 39, "• Coaching Cue: 'Step down over the opposite knee.' Focus on maximal hip height. Do not reach.")
+
+    # 2. JUEVES BLOCK
+    y_pos += 49
+    pdf.set_fill_color(*BG_LIGHT)
+    pdf.rect(12, y_pos, 186, 38, 'F')
+    pdf.set_text_color(*PRIMARY_DARK)
+    pdf.set_font("Helvetica", "B", 11)
+    pdf.text(16, y_pos + 6, "JUEVES: STRENGTH & ELASTICITY")
+    pdf.set_font("Helvetica", "I", 9)
+    pdf.set_text_color(*TEXT_MUTED)
+    pdf.text(16, y_pos + 11, "Focus: Building the structural armor and ankle stiffness needed to support high-velocity impacts.")
+    
+    pdf.set_font("Helvetica", "", 9.5)
+    pdf.set_text_color(*TEXT_DARK)
+    pdf.text(16, y_pos + 18, "• Ankle Stiffness: Pogo Jumps - 3 sets of 15 seconds (Stiff springs, zero knee bend).")
+    pdf.text(16, y_pos + 23, "• Explosive Power: Broad Jumps - 3 sets of 3 max-effort reps (Focus on landing stability).")
+    pdf.text(16, y_pos + 28, "• Speed Lift Foundation: Bodyweight Single-Leg RDLs - 3 sets of 8 reps per leg.")
+    pdf.text(16, y_pos + 33, "• Garage Gym: Light Barbell Quarter-Squat Jumps - 3 sets of 3 reps (explosive upward drive).")
+
+    # 3. VIERNES BLOCK
+    y_pos += 43
+    pdf.set_fill_color(*BG_LIGHT)
+    pdf.rect(12, y_pos, 186, 38, 'F')
+    pdf.set_text_color(*PRIMARY_DARK)
+    pdf.set_font("Helvetica", "B", 11)
+    pdf.text(16, y_pos + 6, "VIERNES: SPEED ENDURANCE & RELAXATION")
+    pdf.set_font("Helvetica", "I", 9)
+    pdf.set_text_color(*TEXT_MUTED)
+    pdf.text(16, y_pos + 11, "Focus: Maintaining high top-end velocities without tightening up late in the race.")
+    
+    pdf.set_font("Helvetica", "", 9.5)
+    pdf.set_text_color(*TEXT_DARK)
+    pdf.text(16, y_pos + 18, "• Warm-Up: Standard full dynamic track protocol.")
+    pdf.text(16, y_pos + 23, "• The Workout: Ins & Outs (Float Sprints) - 60 meters total distance.")
+    pdf.text(16, y_pos + 28, "• Execution: 20m acceleration zone -> 20m 'Float' phase (relax jaw/face/shoulders) -> 20m re-acceleration.")
+    pdf.text(16, y_pos + 33, "• Volume & Rest: 3 high-quality reps. 5 full minutes rest between reps.")
 
     # 4. SÁBADO & DOMINGO BLOCK
     y_pos += 43
@@ -107,13 +195,13 @@ def generate_training_pdf():
     pdf.rect(12, y_pos, 186, 22, 'F')
     pdf.set_text_color(*PRIMARY_DARK)
     pdf.set_font("Helvetica", "B", 11)
-    [span_27](start_span)pdf.text(16, y_pos + 6, "SABADO & DOMINGO: COMPLETE CNS RECOVERY") #[span_27](end_span)
+    pdf.text(16, y_pos + 6, "SABADO & DOMINGO: COMPLETE CNS RECOVERY")
     pdf.set_font("Helvetica", "I", 9)
     pdf.set_text_color(*TEXT_MUTED)
-    [span_28](start_span)pdf.text(16, y_pos + 11, "Focus: Complete structural and neural compensation.") #[span_28](end_span)
+    pdf.text(16, y_pos + 11, "Focus: Complete structural and neural compensation.")
     pdf.set_font("Helvetica", "", 9.5)
     pdf.set_text_color(*TEXT_DARK)
-    [span_29](start_span)pdf.text(16, y_pos + 17, "• Zero running or lifting. Allow the central nervous system to super-compensate for Week 2.") #[span_29](end_span)
+    pdf.text(16, y_pos + 17, "• Zero running or lifting. Allow the central nervous system to super-compensate for Week 2.")
 
     # --- FOOTER SECTION (OPERATIONAL NOTE) ---
     y_pos += 29
@@ -122,12 +210,12 @@ def generate_training_pdf():
     
     pdf.set_font("Helvetica", "B", 9)
     pdf.set_text_color(*PRIMARY_DARK)
-    [span_30](start_span)pdf.text(12, y_pos + 5, "Coach Dad's Operational Note:") #[span_30](end_span)
+    pdf.text(12, y_pos + 5, "Coach Dad's Operational Note:")
     
     pdf.set_font("Helvetica", "", 8.5)
     pdf.set_text_color(*TEXT_DARK)
-    [span_31](start_span)note_line1 = "Quality Over Quantity. Speed training is neural, not metabolic. If posture degrades or mechanics look" #[span_31](end_span)
-    note_line2 = "sluggish during any rep, terminate the session immediately. Log wicket metrics to adjust base if necessary." [span_32](start_span)#
+    note_line1 = "Quality Over Quantity. Speed training is neural, not metabolic. If posture degrades or mechanics look"
+    note_line2 = "sluggish during any rep, terminate the session immediately. Log wicket metrics to adjust base if necessary."
     pdf.text(12, y_pos + 10, note_line1)
     pdf.text(12, y_pos + 14, note_line2)
 
