@@ -33,7 +33,7 @@ def generate_training_pdf():
     pdf.text(15, 24, "Summer Training Plan Block")
     pdf.text(15, 30, "Microcycle: Week 1 Consolidation")
     
-    # Athlete & Phase Info (Right Aligned layout positions)
+    # Athlete & Phase Info
     pdf.set_font("Helvetica", "B", 10)
     pdf.set_text_color(*ACCENT_YELLOW)
     pdf.text(130, 16, "ATLETA: Aisa Rodriguez (10th)")
@@ -45,7 +45,7 @@ def generate_training_pdf():
     # --- WORKOUT BLOCKS ---
     y_pos = 52
 
-    # 1. MIÉRCOLES BLOCK (Accents removed for encoding stability)
+    # 1. MIERCOLES BLOCK
     pdf.set_fill_color(*BG_LIGHT)
     pdf.rect(12, y_pos, 186, 44, 'F')
     pdf.set_text_color(*PRIMARY_DARK)
@@ -58,12 +58,12 @@ def generate_training_pdf():
     pdf.set_font("Helvetica", "", 9.5)
     pdf.set_text_color(*TEXT_DARK)
     pdf.text(16, y_pos + 18, "• Pre-Session Prep: 3 Dynamic Mobility Movements + Fence Drills / Wall Knee Drives (3x10 single exchanges).")
-    pdf.text(16, y_pos + 23, "  Lock in 'Toes to the Nose'.")
+    pdf.text(16, y_pos + 23, "  Lock in Toes to the Nose.")
     pdf.set_font("Helvetica", "B", 9.5)
     pdf.text(16, y_pos + 29, "The Technical Tool: Wicket Runs (5-6 high-quality runs).")
     pdf.set_font("Helvetica", "", 9.5)
     pdf.text(16, y_pos + 34, "• Setup & Spacing: Set up at a 5.0 ft base. First marker 11-12m from start line, followed by 6 to 8 wickets.")
-    pdf.text(16, y_pos + 39, "• Coaching Cue: 'Step down over the opposite knee.' Focus on maximal hip height. Do not reach.")
+    pdf.text(16, y_pos + 39, "• Coaching Cue: Step down over the opposite knee. Focus on maximal hip height. Do not reach.")
 
     # 2. JUEVES BLOCK
     y_pos += 49
@@ -98,10 +98,10 @@ def generate_training_pdf():
     pdf.set_text_color(*TEXT_DARK)
     pdf.text(16, y_pos + 18, "• Warm-Up: Standard full dynamic track protocol.")
     pdf.text(16, y_pos + 23, "• The Workout: Ins & Outs (Float Sprints) - 60 meters total distance.")
-    pdf.text(16, y_pos + 28, "• Execution: 20m acceleration zone -> 20m 'Float' phase (relax jaw/face/shoulders) -> 20m re-acceleration.")
+    pdf.text(16, y_pos + 28, "• Execution: 20m acceleration zone -> 20m Float phase (relax jaw/face/shoulders) -> 20m re-acceleration.")
     pdf.text(16, y_pos + 33, "• Volume & Rest: 3 high-quality reps. 5 full minutes rest between reps.")
 
-    # 4. SÁBADO & DOMINGO BLOCK (Accents removed for encoding stability)
+    # 4. SABADO & DOMINGO BLOCK
     y_pos += 43
     pdf.set_fill_color(*BG_LIGHT)
     pdf.rect(12, y_pos, 186, 22, 'F')
