@@ -81,7 +81,7 @@ def generate_training_pdf():
     pdf.set_font("Helvetica", "", 9)
     pdf.text(42, y_pos + 6, "Quality over quantity. If she looks tired or posture breaks, stop early.")
 
-    return pdf.output(dest='S')
+    pdf_output = pdf.output(dest='S')
 
 # 2. LOGIN LOGIC (The Foyer)
 if "logged_in" not in st.session_state:
