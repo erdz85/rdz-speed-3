@@ -96,8 +96,7 @@ def generate_training_pdf():
     pdf.set_text_color(*TEXT_DARK)
     pdf.text(16, y_pos + 18, "- Warm-Up: Standard full dynamic track protocol.")
     pdf.text(16, y_pos + 23, "- The Workout: Ins & Outs (Float Sprints) - 60 meters total distance.")
-    pdf.text(16, y_pos + 28, "- Execution: 20m acceleration zone -> 20m Float phase (Maintain velocity but consciously relax jaw/face/shoulders) 
-    -> 20m re-acceleration.")
+    pdf.text(16, y_pos + 28, "- Execution: 20m acceleration zone -> 20m Float phase (Maintain velocity, relax jaw/face/shoulders) -> 20m re-acceleration.")
     pdf.text(16, y_pos + 33, "- Volume & Rest: 3 high-quality reps. 5 full minutes rest between reps.")
 
     # 4. SABADO & DOMINGO BLOCK
