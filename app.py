@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 from fpdf import FPDF
+import io
 
 def generate_training_pdf():
     pdf = FPDF()
