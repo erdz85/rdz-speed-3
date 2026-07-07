@@ -5,25 +5,24 @@ from fpdf import FPDF
 import io
 
 def generate_training_pdf():
-    pdf = FPDF()
+    # Use standard 'A4' and 'mm' explicit parameters for stability
+    pdf = FPDF(orientation='P', unit='mm', format='A4')
     pdf.add_page()
     
     # --- BRAND COLOR PALETTE ---
-    PRIMARY_DARK = (20, 24, 33)    # Athletic charcoal
-    ACCENT_YELLOW = (255, 204, 0)  # Speed lab lightning yellow
-    TEXT_DARK = (30, 30, 30)       # Main body text
-    TEXT_MUTED = (100, 105, 115)   # Subtitles
-    BG_LIGHT = (245, 247, 250)     # Clean card backgrounds
+    PRIMARY_DARK = (20, 24, 33)    
+    ACCENT_YELLOW = (255, 204, 0)  
+    TEXT_DARK = (30, 30, 30)       
+    TEXT_MUTED = (100, 105, 115)   
+    BG_LIGHT = (245, 247, 250)     
 
     # --- TOP BRANDING HEADER ---
     pdf.set_fill_color(*PRIMARY_DARK)
     pdf.rect(0, 0, 210, 42, 'F')
     
-    # Yellow Accent Bar
     pdf.set_fill_color(*ACCENT_YELLOW)
     pdf.rect(0, 42, 210, 2, 'F')
     
-    # Main Header Text
     pdf.set_font("Helvetica", "B", 16)
     pdf.set_text_color(255, 255, 255)
     pdf.text(15, 16, "RDZ SPEED DEVELOPMENT FLYS DATA V0.13.5")
@@ -33,7 +32,6 @@ def generate_training_pdf():
     pdf.text(15, 24, "Summer Training Plan Block")
     pdf.text(15, 30, "Microcycle: Week 1 Consolidation")
     
-    # Athlete & Phase Info
     pdf.set_font("Helvetica", "B", 10)
     pdf.set_text_color(*ACCENT_YELLOW)
     pdf.text(130, 16, "ATLETA: Aisa Rodriguez (10th)")
@@ -57,13 +55,13 @@ def generate_training_pdf():
     
     pdf.set_font("Helvetica", "", 9.5)
     pdf.set_text_color(*TEXT_DARK)
-    pdf.text(16, y_pos + 18, "• Pre-Session Prep: 3 Dynamic Mobility Movements + Fence Drills / Wall Knee Drives (3x10 single exchanges).")
+    pdf.text(16, y_pos + 18, "- Pre-Session Prep: 3 Dynamic Mobility Movements + Fence Drills / Wall Knee Drives (3x10 single exchanges).")
     pdf.text(16, y_pos + 23, "  Lock in Toes to the Nose.")
     pdf.set_font("Helvetica", "B", 9.5)
     pdf.text(16, y_pos + 29, "The Technical Tool: Wicket Runs (5-6 high-quality runs).")
     pdf.set_font("Helvetica", "", 9.5)
-    pdf.text(16, y_pos + 34, "• Setup & Spacing: Set up at a 5.0 ft base. First marker 11-12m from start line, followed by 6 to 8 wickets.")
-    pdf.text(16, y_pos + 39, "• Coaching Cue: Step down over the opposite knee. Focus on maximal hip height. Do not reach.")
+    pdf.text(16, y_pos + 34, "- Setup & Spacing: Set up at a 5.0 ft base. First marker 11-12m from start line, followed by 6 to 8 wickets.")
+    pdf.text(16, y_pos + 39, "- Coaching Cue: Step down over the opposite knee. Focus on maximal hip height. Do not reach.")
 
     # 2. JUEVES BLOCK
     y_pos += 49
@@ -78,10 +76,10 @@ def generate_training_pdf():
     
     pdf.set_font("Helvetica", "", 9.5)
     pdf.set_text_color(*TEXT_DARK)
-    pdf.text(16, y_pos + 18, "• Ankle Stiffness: Pogo Jumps - 3 sets of 15 seconds (Stiff springs, zero knee bend).")
-    pdf.text(16, y_pos + 23, "• Explosive Power: Broad Jumps - 3 sets of 3 max-effort reps (Focus on landing stability).")
-    pdf.text(16, y_pos + 28, "• Speed Lift Foundation: Bodyweight Single-Leg RDLs - 3 sets of 8 reps per leg.")
-    pdf.text(16, y_pos + 33, "• Garage Gym: Light Barbell Quarter-Squat Jumps - 3 sets of 3 reps (explosive upward drive).")
+    pdf.text(16, y_pos + 18, "- Ankle Stiffness: Pogo Jumps - 3 sets of 15 seconds (Stiff springs, zero knee bend).")
+    pdf.text(16, y_pos + 23, "- Explosive Power: Broad Jumps - 3 sets of 3 max-effort reps (Focus on landing stability).")
+    pdf.text(16, y_pos + 28, "- Speed Lift Foundation: Bodyweight Single-Leg RDLs - 3 sets of 8 reps per leg.")
+    pdf.text(16, y_pos + 33, "- Garage Gym: Light Barbell Quarter-Squat Jumps - 3 sets of 3 reps (explosive upward drive).")
 
     # 3. VIERNES BLOCK
     y_pos += 43
@@ -96,10 +94,10 @@ def generate_training_pdf():
     
     pdf.set_font("Helvetica", "", 9.5)
     pdf.set_text_color(*TEXT_DARK)
-    pdf.text(16, y_pos + 18, "• Warm-Up: Standard full dynamic track protocol.")
-    pdf.text(16, y_pos + 23, "• The Workout: Ins & Outs (Float Sprints) - 60 meters total distance.")
-    pdf.text(16, y_pos + 28, "• Execution: 20m acceleration zone -> 20m Float phase (relax jaw/face/shoulders) -> 20m re-acceleration.")
-    pdf.text(16, y_pos + 33, "• Volume & Rest: 3 high-quality reps. 5 full minutes rest between reps.")
+    pdf.text(16, y_pos + 18, "- Warm-Up: Standard full dynamic track protocol.")
+    pdf.text(16, y_pos + 23, "- The Workout: Ins & Outs (Float Sprints) - 60 meters total distance.")
+    pdf.text(16, y_pos + 28, "- Execution: 20m acceleration zone -> 20m Float phase (relax jaw/face/shoulders) -> 20m re-acceleration.")
+    pdf.text(16, y_pos + 33, "- Volume & Rest: 3 high-quality reps. 5 full minutes rest between reps.")
 
     # 4. SABADO & DOMINGO BLOCK
     y_pos += 43
@@ -113,9 +111,9 @@ def generate_training_pdf():
     pdf.text(16, y_pos + 11, "Focus: Complete structural and neural compensation.")
     pdf.set_font("Helvetica", "", 9.5)
     pdf.set_text_color(*TEXT_DARK)
-    pdf.text(16, y_pos + 17, "• Zero running or lifting. Allow the central nervous system to super-compensate for Week 2.")
+    pdf.text(16, y_pos + 17, "- Zero running or lifting. Allow the central nervous system to super-compensate for Week 2.")
 
-    # --- FOOTER SECTION (OPERATIONAL NOTE) ---
+    # --- FOOTER SECTION ---
     y_pos += 29
     pdf.set_draw_color(210, 215, 225)
     pdf.line(12, y_pos, 198, y_pos)
@@ -131,8 +129,9 @@ def generate_training_pdf():
     pdf.text(12, y_pos + 10, note_line1)
     pdf.text(12, y_pos + 14, note_line2)
 
-    return pdf.output(dest='S').encode('latin-1')
-
+    # --- FIX: Output to an external memory stream to bypass internal latin1 bugs ---
+    pdf_string = pdf.output(dest='S')
+    return io.BytesIO(pdf_string.encode('latin-1'))
 
 # 2. LOGIN LOGIC (The Foyer)
 if "logged_in" not in st.session_state:
@@ -533,12 +532,12 @@ def workout_module():
     st.header("🏋️ Workout Planner")
     st.write("Click below to download your structured training plan template.")
     
-    # Prepares the clean, styled data bytes seamlessly
-    pdf_bytes = generate_training_pdf()
+    # Get the raw byte buffer stream
+    pdf_buffer = generate_training_pdf()
     
     st.download_button(
         label="📥 Download Week 1 Training PDF",
-        data=pdf_bytes,
+        data=pdf_buffer.getvalue(), # Bypasses string translation completely
         file_name="aisa_training_plan_week1.pdf",
         mime="application/pdf"
     )
