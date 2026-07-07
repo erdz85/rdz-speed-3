@@ -23,24 +23,24 @@ def generate_training_pdf():
     pdf.set_fill_color(*ACCENT_YELLOW)
     pdf.rect(0, 42, 210, 2, 'F')
     
-    # Main Header Text
+        # Main Header Text
     pdf.set_font("Helvetica", "B", 16)
     pdf.set_text_color(255, 255, 255)
-    pdf.text(15, 16, "RDZ SPEED DEVELOPMENT FLYS DATA V0.13.5")[span_0](start_span)[span_0](end_span)
+    pdf.text(15, 16, "RDZ SPEED DEVELOPMENT FLYS DATA V0.13.5")
     
     pdf.set_font("Helvetica", "", 10)
     pdf.set_text_color(200, 205, 215)
-    [span_3](start_span)pdf.text(15, 24, "Summer Training Plan Block") #[span_3](end_span)
-    [span_4](start_span)pdf.text(15, 30, "Microcycle: Week 1 Consolidation") #[span_4](end_span)
+    pdf.text(15, 24, "Summer Training Plan Block")
+    pdf.text(15, 30, "Microcycle: Week 1 Consolidation")
     
     # Athlete & Phase Info (Right Aligned layout positions)
     pdf.set_font("Helvetica", "B", 10)
     pdf.set_text_color(*ACCENT_YELLOW)
-    [span_5](start_span)pdf.text(130, 16, "ATLETA: Aisa Rodriguez (10th)") #[span_5](end_span)
+    pdf.text(130, 16, "ATLETA: Aisa Rodriguez (10th)")
     pdf.set_font("Helvetica", "", 10)
     pdf.set_text_color(255, 255, 255)
-    [span_6](start_span)pdf.text(130, 24, "Fase: Phase 1 (Force & Coordination)") #[span_6](end_span)
-    [span_7](start_span)pdf.text(130, 30, "Objetivo: Sub-14 Transition (Target: 13s Hunt)") #[span_7](end_span)
+    pdf.text(130, 24, "Fase: Phase 1 (Force & Coordination)")
+    pdf.text(130, 30, "Objetivo: Sub-14 Transition (Target: 13s Hunt)")
 
     # --- WORKOUT BLOCKS ---
     y_pos = 52
