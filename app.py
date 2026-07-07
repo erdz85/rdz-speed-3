@@ -26,7 +26,7 @@ def generate_training_pdf():
     # Main Header Text
     pdf.set_font("Helvetica", "B", 16)
     pdf.set_text_color(255, 255, 255)
-    [span_2](start_span)pdf.text(15, 16, "RDZ SPEED DEVELOPMENT FLYS DATA V0.13.5") #[span_2](end_span)
+    pdf.text(15, 16, "RDZ SPEED DEVELOPMENT FLYS DATA V0.13.5")[span_0](start_span)[span_0](end_span)
     
     pdf.set_font("Helvetica", "", 10)
     pdf.set_text_color(200, 205, 215)
