@@ -82,7 +82,8 @@ def generate_training_pdf():
     pdf.set_font("Helvetica", "", 9)
     pdf.text(42, y_pos + 6, "Quality over quantity. If she looks tired or posture breaks, stop early.")
 
-    pdf_output = pdf.output(dest='S')
+    return pdf.output(dest='S').encode('latin-1')
+
 
 # 2. LOGIN LOGIC (The Foyer)
 if "logged_in" not in st.session_state:
@@ -482,16 +483,18 @@ def relay_optimizer_module():
                     
 def workout_module():
     st.header("🏋️ Workout Planner")
-    st.write("Click below to download the training plan.")
+    st.write("Click below to download the latest training plan.")
     
-    if st.button("Generate PDF"):
-        pdf_bytes = generate_training_pdf()
-        st.download_button(
-            label="📥 Download Week 1 Training PDF",
-            data=pdf_bytes,
-            file_name="aisa_training_plan_week1.pdf",
-            mime="application/pdf"
-        )
+    # This prepares the data
+    pdf_bytes = generate_training_pdf()
+    
+    # This renders the download button directly
+    st.download_button(
+        label="📥 Download Training PDF",
+        data=pdf_bytes,
+        file_name="RDZ_Training_Plan.pdf",
+        mime="application/pdf"
+    )
                   
 # ==========================================
 # 4. MAIN EXECUTION
